@@ -13,14 +13,12 @@
 
 int main()
 {
-	//创建一个监听socket
 	int listenfd = socket(AF_INET, SOCK_STREAM, 0);
 	if(listenfd == -1)
 	{
 		std::cout<<"create listen socket error" << std::endl;
 		return -1;
 	}
-	
 	//设置重用IP地址和端口号
 	int on = 1;
 	setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, (char*)&on, sizeof(on));
