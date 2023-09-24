@@ -23,7 +23,6 @@ int main()
 	int on = 1;
 	setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, (char*)&on, sizeof(on));
 	setsockopt(listenfd, SOL_SOCKET, SO_REUSEPORT, (char*)&on, sizeof(on));
-	
 	//将监听socket设置为非阻塞
 	int oldSocketFlag = fcntl(listenfd, F_GETFL, 0);
 	int newSocketFlag = oldSocketFlag | O_NONBLOCK;
@@ -33,7 +32,6 @@ int main()
 		std::cout << "set listenfd to nonblock error" << std::endl;
 		return -1;
 	}
-	
 	//初始化服务器的地址
 	struct sockaddr_in bindaddr;
 	bindaddr.sin_family = AF_INET;
