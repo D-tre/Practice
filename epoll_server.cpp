@@ -37,14 +37,12 @@ int main()
 	bindaddr.sin_family = AF_INET;
 	bindaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	bindaddr.sin_port = htons(3000);
-	
 	if(bind(listenfd, (struct sockaddr*)&bindaddr, sizeof(bindaddr)) == -1)
 	{
 		std::cout<< "bind listen socket error" << std::endl;
 		close(listenfd);
 		return -1;
 	}
-	
 	//启动监听
 	if(listen(listenfd, SOMAXCONN) == -1)
 	{
@@ -52,7 +50,6 @@ int main()
 		close(listenfd);
 		return -1;
 	}
-	
 	//创建epollfd
 	int epollfd = epoll_create(1);
 	if(epollfd == -1)
@@ -61,7 +58,6 @@ int main()
 		close(listenfd);
 		return -1;
 	}
-	
 	epoll_event listen_fd_event;
 	listen_fd_event.data.fd = listenfd;
 	listen_fd_event.events = EPOLLIN;
