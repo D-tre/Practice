@@ -45,9 +45,7 @@ int main(int argc, char *argv[])
         for(i=0; i<nready; i++)
         {
             if(!(events[i].events & EPOLLIN))
-            {
                 continue;
-            }
 
             if(events[i].data.fd == listenfd)//表示有新的连接
             {
@@ -55,15 +53,15 @@ int main(int argc, char *argv[])
                 int len=sizeof(client_addr);
                 memset(&client_addr,0,sizeof(client_addr));
                 connfd = accept(listenfd, (struct sockaddr *)&client_addr, &len);
- 				event.events = EPOLLIN|EPOLLET; 
-				event.data.fd = connfd;  
-				epoll_ctl(efd, EPOLL_CTL_ADD, connfd, &event);               
+ 				event.events = EPOLLIN|EPOLLET;
+				event.data.fd = connfd;
+				epoll_ctl(efd, EPOLL_CTL_ADD, connfd, &event);   
             }
             else//表示旧的数据产生可读事件(1 客户端发来数据 2 客户端断开链接)
             {
      			connfd=events[i].data.fd;
 				char recvline [1024];
-				memset(recvline,0,1024);	
+				memset(recvline,0,1024);
                 int nread=read(connfd,recvline,sizeof(recvline));
 				if(nread==0)
 				{
@@ -72,9 +70,7 @@ int main(int argc, char *argv[])
 					close(connfd);//关闭客服端 select一样
                 }
 				else
-				{
 					printf("%s",recvline);
-				}			
             }
         }
     }

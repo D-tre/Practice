@@ -46,9 +46,7 @@ int main(int argc, char *argv[])
         len = read(sockfd,recvline,1024);
 
         if(len == 0)
-        {
             printf("server is close");
-        }
 
         printf("receive from server:%s\n",recvline);
     }
