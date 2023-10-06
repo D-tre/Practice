@@ -1,177 +1,80 @@
-//epoll_server.cpp
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
+#include <sys/epoll.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/epoll.h>
-#include <poll.h>
-#include <string.h>
-#include <vector>
-#include <errno.h>
+#include <sys/types.h> 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <iostream>
+#include <cstring>
 
-int main()
+using namespace std;
+#define MAX_EVENTS 10
+
+int main() 
 {
-	int listenfd = socket(AF_INET, SOCK_STREAM, 0);
-	if(listenfd == -1)
-	{
-		std::cout<<"create listen socket error" << std::endl;
-		return -1;
-	}
-	//设置重用IP地址和端口号
-	int on = 1;
-	setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, (char*)&on, sizeof(on));
-	setsockopt(listenfd, SOL_SOCKET, SO_REUSEPORT, (char*)&on, sizeof(on));
-	//将监听socket设置为非阻塞
-	int oldSocketFlag = fcntl(listenfd, F_GETFL, 0);
-	int newSocketFlag = oldSocketFlag | O_NONBLOCK;
-	if(fcntl(listenfd, F_SETFL, newSocketFlag) == -1)
-	{
-		close(listenfd);
-		std::cout << "set listenfd to nonblock error" << std::endl;
-		return -1;
-	}
-	//初始化服务器的地址
-	struct sockaddr_in bindaddr;
-	bindaddr.sin_family = AF_INET;
-	bindaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	bindaddr.sin_port = htons(3000);
-	if(bind(listenfd, (struct sockaddr*)&bindaddr, sizeof(bindaddr)) == -1)
-	{
-		std::cout<< "bind listen socket error" << std::endl;
-		close(listenfd);
-		return -1;
-	}
-	//启动监听
-	if(listen(listenfd, SOMAXCONN) == -1)
-	{
-		std::cout << "listen error." << std::endl;
-		close(listenfd);
-		return -1;
-	}
-	//创建epollfd
-	int epollfd = epoll_create(1);
-	if(epollfd == -1)
-	{
-		std::cout<<"create epollfd error." << std::endl;
-		close(listenfd);
-		return -1;
-	}
-	epoll_event listen_fd_event;
-	listen_fd_event.data.fd = listenfd;
-	listen_fd_event.events = EPOLLIN;
-	//若取消注释这一行，则使用ET模式
-	//listen_fd_event.events |= EPOLLIN;
-	
-	//将监听socket绑定到epollfd上
-	if(epoll_ctl(epollfd, EPOLL_CTL_ADD, listenfd, &listen_fd_event) == -1)
-	{
-		std::cout << "epoll_ctl error" << std::endl;
-		close(listenfd);
-		return -1;
-	}
-	
-	int n;
-	while(true)
-	{
-		epoll_event epoll_events[1024];
-		n = epoll_wait(epollfd, epoll_events, 1024, 1000);
-		if(n < 0)
-		{
-			//被信号中断
-			if(errno == EINTR)
-				continue;
-			//出错，退出
-			break;
-		}
-		else if(n ==0)
-		{
-			//超时
-			continue;
-		}
-		
-		for(size_t i = 0; i < n; ++i)
-		{
-			//事件可读
-			if(epoll_events[i].events & EPOLLIN)
-			{
-				if(epoll_events[i].data.fd == listenfd)
-				{
-					//监听socket,接受新连接
-					struct sockaddr_in clientaddr;
-					socklen_t clientaddrlen = sizeof(clientaddr);
-					int clientfd = accept(listenfd, (struct sockaddr*)&clientaddr, &clientaddrlen);
-					if(clientfd != -1)
-					{
-						int oldSocketFlag = fcntl(clientfd, F_GETFL, 0);
-						int newSocketFlag = oldSocketFlag | O_NONBLOCK;
-						if(fcntl(clientfd, F_SETFL, newSocketFlag) == -1)
-						{
-							close(clientfd);
-							std::cout<<"set clientfd to nonblocking error" << std::endl;
-						}
-						else
-						{
-							epoll_event client_fd_event;
-							client_fd_event.data.fd = clientfd;
-							client_fd_event.events = EPOLLIN;
-							//若取消注释这一行，则使用ET模式
-							//client_fd_event.events |= EPOLLET;
-							if(epoll_ctl(epollfd, EPOLL_CTL_ADD, clientfd, &client_fd_event)!= -1)
-							{
-								std::cout<<"new client accept, clientfd: " << clientfd << std::endl;
-							}
-							else
-							{
-								std::cout<<"add client fd to epollfd error" << std::endl;
-								close(clientfd);
-							}
-						}
-					}
-				}
-				else
-				{
-					std::cout << "client fd: " << epoll_events[i].data.fd << "recv data." << std::endl;
-					//普通clientfd
-					char ch;
-					//每次只接受1字节
-					int m = recv(epoll_events[i].data.fd, &ch, 1, 0);
-					if(m == 0)
-					{
-						//对端关闭了连接，从epollfd上移除clientfd
-						if(epoll_ctl(epollfd, EPOLL_CTL_DEL, epoll_events[i].data.fd, NULL) != -1)
-						{
-							std::cout<<"client disconnected,clientfd" << epoll_events[i].data.fd << std::endl;
-						}
-						close(epoll_events[i].data.fd);
-					}
-					else if(m < 0)
-					{
-						//出错
-						if(errno != EWOULDBLOCK && errno != EINTR)
-						{
-							if(epoll_ctl(epollfd, EPOLL_CTL_DEL, epoll_events[i].data.fd, NULL) != -1)
-							{
-								std::cout<<"client disconnected,clientfd" << epoll_events[i].data.fd << std::endl;
-							}
-							close(epoll_events[i].data.fd);
-						}
-					}
-					else
-					{
-						//正常收到数据
-						std::cout<<"recv from client:"<<epoll_events[i].data.fd<<", " << ch << std::endl;
-					}
-				}
-			}
-			else if(epoll_events[i].events & EPOLLERR)
-			{
-				//不处理
-			}
-		}
-	}
-	
-	close(listenfd);
-	return 0;	
+  int efd = epoll_create(1);
+  int listen_sock = socket(AF_INET, SOCK_STREAM, 0);
+  // 设置 listen_sock 非阻塞
+  fcntl(listen_sock, F_SETFL, O_NONBLOCK);  
+  int opt = 1;
+  setsockopt(listen_sock, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)); 
+
+  // 绑定端口 & 协议
+  struct sockaddr_in address;
+  address.sin_family = AF_INET;
+  address.sin_addr.s_addr = INADDR_ANY;
+  address.sin_port = htons(9000); // 指定监听端口8080
+  //绑定
+  bind(listen_sock, (struct sockaddr*)&address, sizeof(address));
+  listen(listen_sock,32);
+
+  // 将 listen_sock 添加到 epoll 监听
+  struct epoll_event listen_event;
+  listen_event.events = EPOLLIN;
+  epoll_ctl(efd, EPOLL_CTL_ADD, listen_sock, &listen_event);
+  struct epoll_event events[MAX_EVENTS];
+  while (1) 
+  {
+    int n = epoll_wait(efd, events, MAX_EVENTS, -1);
+    for (int i = 0; i < n; i++) 
+    {
+      int sockfd = events[i].data.fd;
+      if (sockfd == listen_sock) 
+      {
+        cout<<"新连接建立\n"<<endl;
+        int conn_sock = accept(listen_sock, NULL, NULL);
+        // 添加到 epoll 继续监听
+        struct epoll_event event;
+        event.events = EPOLLOUT | EPOLLET;
+        event.data.fd = conn_sock;
+        epoll_ctl(efd, EPOLL_CTL_ADD, conn_sock, &event);
+        
+      } 
+      else if (events[i].events & EPOLLIN) 
+      {
+        cout<<"read"<<endl;
+        // 可读事件
+        char buf[1024];
+        read(sockfd, buf, 1024);
+        printf("%s\n",buf);
+      } 
+      else if(events[i].events & EPOLLOUT) 
+      {
+        // 可写事件  
+        cout<<"write"<<endl;
+        const char* resp = "HTTP/1.1 200 OK\r\n\r\n";
+        write(sockfd, resp, strlen(resp));
+        events[i].events= EPOLLIN;
+      } 
+      /*else if(events[i].events & EPOLLHUP) 
+      {
+        // 关闭连接
+        cout<<"close connect"<<endl;
+        close(sockfd); 
+      }*/
+    }
+
+  }
+  return 0;
 }
