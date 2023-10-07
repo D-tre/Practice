@@ -32,6 +32,7 @@ int main()
   // 将 listen_sock 添加到 epoll 监听
   struct epoll_event listen_event;
   listen_event.events = EPOLLIN;
+  listen_event.data.fd=listen_sock;
   epoll_ctl(efd, EPOLL_CTL_ADD, listen_sock, &listen_event);
   struct epoll_event events[MAX_EVENTS];
   while (1) 
@@ -48,8 +49,8 @@ int main()
         struct epoll_event event;
         event.events = EPOLLOUT | EPOLLET;
         event.data.fd = conn_sock;
+        fcntl(conn_sock, F_SETFL, O_NONBLOCK); 
         epoll_ctl(efd, EPOLL_CTL_ADD, conn_sock, &event);
-        
       } 
       else if (events[i].events & EPOLLIN) 
       {
@@ -58,6 +59,10 @@ int main()
         char buf[1024];
         read(sockfd, buf, 1024);
         printf("%s\n",buf);
+        struct epoll_event event;
+        event.events = EPOLLOUT;//转到读
+        event.data.fd = sockfd;
+        epoll_ctl(efd, EPOLL_CTL_MOD, sockfd, &event);
       } 
       else if(events[i].events & EPOLLOUT) 
       {
@@ -65,7 +70,10 @@ int main()
         cout<<"write"<<endl;
         const char* resp = "HTTP/1.1 200 OK\r\n\r\n";
         write(sockfd, resp, strlen(resp));
-        events[i].events= EPOLLIN;
+        struct epoll_event event;
+        event.events = EPOLLIN;//转到写
+        event.data.fd = sockfd;
+        epoll_ctl(efd, EPOLL_CTL_MOD, sockfd, &event);
       } 
       /*else if(events[i].events & EPOLLHUP) 
       {
