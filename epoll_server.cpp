@@ -57,10 +57,15 @@ int main()
         cout<<"read"<<endl;
         // 可读事件
         char buf[1024];
-        read(sockfd, buf, 1024);
+        int nRead = read(sockfd, buf, 1024);
+        if(nRead<=0)
+        {
+          cout<<"对方已退出"<<endl;
+          close(sockfd);
+        }
         printf("%s\n",buf);
         struct epoll_event event;
-        event.events = EPOLLOUT;//转到读
+        event.events = EPOLLOUT;
         event.data.fd = sockfd;
         epoll_ctl(efd, EPOLL_CTL_MOD, sockfd, &event);
       } 
@@ -69,18 +74,23 @@ int main()
         // 可写事件  
         cout<<"write"<<endl;
         const char* resp = "HTTP/1.1 200 OK\r\n\r\n";
-        write(sockfd, resp, strlen(resp));
+        int nRead = write(sockfd, resp, strlen(resp));
+        if(nRead<=0)
+        {
+          cout<<"对方已退出"<<endl;
+          close(sockfd);
+        }
         struct epoll_event event;
-        event.events = EPOLLIN;//转到写
+        event.events = EPOLLIN;
         event.data.fd = sockfd;
         epoll_ctl(efd, EPOLL_CTL_MOD, sockfd, &event);
       } 
-      /*else if(events[i].events & EPOLLHUP) 
+      else if(events[i].events & EPOLLHUP) 
       {
         // 关闭连接
         cout<<"close connect"<<endl;
         close(sockfd); 
-      }*/
+      }
     }
 
   }
