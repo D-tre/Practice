@@ -24,8 +24,7 @@ int main()
   struct sockaddr_in address;
   address.sin_family = AF_INET;
   address.sin_addr.s_addr = INADDR_ANY;
-  address.sin_port = htons(9000); // 指定监听端口8080
-  //绑定
+  address.sin_port = htons(9000); 
   bind(listen_sock, (struct sockaddr*)&address, sizeof(address));
   listen(listen_sock,32);
 
