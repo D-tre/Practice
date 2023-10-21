@@ -11,9 +11,10 @@ class Profiler//计时工具类
 {
 public:
 	Profiler(const string& tag)
-		: m_Tag(tag)
-		, m_StartTime(chrono::high_resolution_clock::now())
-	{}
+	{
+		m_Tag=tag;
+		m_StartTime=chrono::high_resolution_clock::now();
+	}
 	~Profiler()
 	{
 		auto endTime = chrono::high_resolution_clock::now();
@@ -22,7 +23,7 @@ public:
 	}
 private:
 	string m_Tag;
-	chrono::steady_clock::time_point m_StartTime;
+	chrono::system_clock::time_point m_StartTime;
 };
 template<typename T>
 void moveData(T& dst, T& src)
@@ -40,7 +41,7 @@ int main()
 	{//移动语义代码块
 		vector<int> s1(100000);
 		auto profiler = Profiler("move");
-		for (int i = 0; i < 1000; ++i)
+		for (int i = 0; i < 10000; ++i)
 		{
 			moveData(d1, s1);
 			moveData(s1, d1);
