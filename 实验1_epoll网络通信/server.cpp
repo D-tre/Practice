@@ -13,7 +13,6 @@
 int main(int argc, char *argv[])
 {
     int listenfd = socket(AF_INET, SOCK_STREAM, 0);
-
     int on = 1;
     int i;
     int connfd;
@@ -28,9 +27,7 @@ int main(int argc, char *argv[])
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY); //监听本地所有的IP地址；INADDR_ANY表示的是一个服务器上所有的网卡（服务器可能不止一个网卡）多个本地ip地址都进行绑定端口号，进行侦听。
 
     bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
-
     listen(listenfd, 32);
-
     int efd = epoll_create(OPEN_MAX);
 
     struct epoll_event event, events[OPEN_MAX];
@@ -47,7 +44,6 @@ int main(int argc, char *argv[])
         {
             if(!(events[i].events & EPOLLIN))
                 continue;
-
             if(events[i].data.fd == listenfd)//表示有新的连接
             {
                 printf("epoll accept\n");
@@ -83,6 +79,5 @@ int main(int argc, char *argv[])
             }
         }
     }
-
     return 0;    
 }
