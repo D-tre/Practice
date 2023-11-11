@@ -1,40 +1,22 @@
-#include <iostream>
 #include <string.h>
 #include <sstream>
 #include <stdio.h>
 #include <vector>
-#include <chrono>
-
+#include "CalTime.hpp"
 using namespace std;
 
-class Profiler//计时工具类
-{
-public:
-	Profiler(const string& tag)
-	{
-		m_Tag=tag;
-		m_StartTime=chrono::high_resolution_clock::now();
-	}
-	~Profiler()
-	{
-		auto endTime = chrono::high_resolution_clock::now();
-		auto duration = chrono::duration_cast<chrono::milliseconds>(endTime - m_StartTime).count();
-		cout << m_Tag << " 耗时: " << duration << " ms" << endl;
-	}
-private:
-	string m_Tag;
-	chrono::system_clock::time_point m_StartTime;
-};
 template<typename T>
 void moveData(T& dst, T& src)
 {
 	dst = std::move(src);
 }
+
 template<typename T>
 void moveData(T& dst,T&& src)
 {
 	dst = src;
 }
+
 template<typename T>
 void copyData(T& dst, T& src)
 {
