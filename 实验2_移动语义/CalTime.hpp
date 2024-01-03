@@ -2,19 +2,19 @@
 #include <iostream>
 #include <chrono>
 #include <string>
-class Profiler//è®¡æ—¶å·¥å…·ç±»
+class Profiler//¼ÆÊ±¹¤¾ßÀà
 {
 public:
 	Profiler(const std::string& tag)
 	{
-		m_Tag=tag;
-		m_StartTime=std::chrono::high_resolution_clock::now();
+		m_Tag = tag;
+		m_StartTime = std::chrono::high_resolution_clock::now();
 	}
 	~Profiler()
 	{
 		auto endTime = std::chrono::high_resolution_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - m_StartTime).count();
-		std::cout << m_Tag << " è€—æ—¶: " << duration << " ms" << std::endl;
+		std::cout << m_Tag << " ºÄÊ±: " << duration << " ms" << std::endl;
 	}
 private:
 	std::string m_Tag;

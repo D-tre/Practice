@@ -1,0 +1,1 @@
+g++ -o "/home/aaa/projects/实验2_移动语义/bin/x64/Debug/实验2_移动语义.out" -Wl,--no-undefined -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack "/home/aaa/projects/实验2_移动语义/obj/x64/Debug/class_move.o"

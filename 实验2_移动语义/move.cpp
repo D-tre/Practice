@@ -12,7 +12,7 @@ void moveData(T& dst, T& src)
 }
 
 template<typename T>
-void moveData(T& dst,T&& src)
+void moveData(T& dst, T&& src)
 {
 	dst = src;
 }
@@ -25,7 +25,7 @@ void copyData(T& dst, T& src)
 int main()
 {
 	vector<int> d1;
-	{//ç§»åŠ¨è¯­ä¹‰ä»£ç å—
+	{//ÒÆ¶¯ÓïÒå´úÂë¿é
 		vector<int> s1(100000);
 		auto profiler = Profiler("move");
 		for (int i = 0; i < 10000; ++i)
@@ -35,7 +35,7 @@ int main()
 		}
 	}
 	vector<int> d11;
-	{//ç§»åŠ¨è¯­ä¹‰ä»£ç å—
+	{//ÒÆ¶¯ÓïÒå´úÂë¿é
 		vector<int> s11(100000);
 		auto profiler = Profiler("fail move");
 		for (int i = 0; i < 1000; ++i)
@@ -45,7 +45,7 @@ int main()
 		}
 	}
 	vector<int> d2;
-	{//æ‹·è´è¯­ä¹‰ä»£ç å—
+	{//¿½±´ÓïÒå´úÂë¿é
 		vector<int> s2(100000);
 		auto profiler = Profiler("copy");
 		for (int i = 0; i < 1000; ++i)

@@ -1,0 +1,15 @@
+﻿  正在验证源
+  正在将源远程复制到“192.168.52.128”
+  正在验证体系结构
+  正在验证体系结构
+  正在启动远程生成
+  正在编译源:
+  Server.cpp
+C:\Users\Li\Documents\WinCode\Practice\实验1_epoll网络通信\Server\Server.cpp(59,33): warning : conversion from ‘ssize_t’ {aka ‘long int’} to ‘int’ may change value [-Wconversion]
+C:\Users\Li\Documents\WinCode\Practice\实验1_epoll网络通信\Server\Server.cpp(59,33): warning :    59 |                 int nRead = read(sockfd, buf, 1024);
+C:\Users\Li\Documents\WinCode\Practice\实验1_epoll网络通信\Server\Server.cpp(59,33): warning :       |                             ~~~~^~~~~~~~~~~~~~~~~~~
+C:\Users\Li\Documents\WinCode\Practice\实验1_epoll网络通信\Server\Server.cpp(76,34): warning : conversion from ‘ssize_t’ {aka ‘long int’} to ‘int’ may change value [-Wconversion]
+C:\Users\Li\Documents\WinCode\Practice\实验1_epoll网络通信\Server\Server.cpp(76,34): warning :    76 |                 int nRead = write(sockfd, resp, strlen(resp));
+C:\Users\Li\Documents\WinCode\Practice\实验1_epoll网络通信\Server\Server.cpp(76,34): warning :       |                             ~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  正在链接对象
+  Server.vcxproj -> C:\Users\Li\Documents\WinCode\Practice\实验1_epoll网络通信\Server\bin\x64\Debug\Server.out

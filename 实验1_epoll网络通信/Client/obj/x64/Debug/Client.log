@@ -1,0 +1,12 @@
+﻿  正在验证源
+  正在将源远程复制到“192.168.52.128”
+  正在验证体系结构
+  正在验证体系结构
+  正在启动远程生成
+  正在编译源:
+  Client.cpp
+C:\Users\Li\Documents\WinCode\Practice\实验1_epoll网络通信\Client\Client.cpp(41,19): warning : conversion from ‘ssize_t’ {aka ‘long int’} to ‘int’ may change value [-Wconversion]
+C:\Users\Li\Documents\WinCode\Practice\实验1_epoll网络通信\Client\Client.cpp(41,19): warning :    41 |         len = read(sockfd, recvline, 1024);
+C:\Users\Li\Documents\WinCode\Practice\实验1_epoll网络通信\Client\Client.cpp(41,19): warning :       |               ~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+  正在链接对象
+  Client.vcxproj -> C:\Users\Li\Documents\WinCode\Practice\实验1_epoll网络通信\Client\bin\x64\Debug\Client.out

@@ -1,0 +1,1 @@
+g++ -o "/home/aaa/projects/Server/bin/x64/Debug/Server.out" -Wl,--no-undefined -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack /home/aaa/projects/Server/obj/x64/Debug/Server.o
