@@ -1,0 +1,3 @@
+﻿  01bb.cpp
+seq.obj : error LNK2005: main 已经在 PlayCF.obj 中定义
+C:\Users\Li\Documents\WinCode\Practice\PlayCF\x64\Debug\PlayCF.exe : fatal error LNK1169: 找到一个或多个多重定义的符号
